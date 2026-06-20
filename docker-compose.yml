@@ -1,0 +1,76 @@
+services:
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: alraziq_frontend
+    restart: always
+
+    depends_on:
+      - backend
+
+    labels:
+      - "traefik.enable=true"
+
+      # IMPORTANT
+      - "traefik.docker.network=traefik"
+
+      # Frontend ONLY (exclude API)
+      - "traefik.http.routers.kingsleys_frontend.rule=Host(`dashboard.techscapeoslution.com`) && !PathPrefix(`/api`)"
+      - "traefik.http.routers.kingsleys_frontend.priority=1"
+      - "traefik.http.routers.kingsleys_frontend.entrypoints=websecure"
+      - "traefik.http.routers.kingsleys_frontend.tls=true"
+      - "traefik.http.routers.kingsleys_frontend.tls.certresolver=production"
+
+      # Nginx inside frontend container
+      - "traefik.http.services.kingsleys_frontend.loadbalancer.server.port=80"
+
+    networks:
+      - kingsleys_network
+      - internal_network
+      - traefik
+
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: alraziq_backend
+    restart: always
+
+    env_file:
+      - ./backend/.env
+
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.docker.network=traefik"
+
+      # API routing
+      - "traefik.http.routers.kingsleys_backend.rule=Host(`dashboard.techscapeoslution.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.kingsleys_backend.priority=100"
+      - "traefik.http.routers.kingsleys_backend.entrypoints=websecure"
+      - "traefik.http.routers.kingsleys_backend.tls=true"
+      - "traefik.http.routers.kingsleys_backend.tls.certresolver=production"
+
+      # Express port
+      - "traefik.http.services.kingsleys_backend.loadbalancer.server.port=5000"
+
+    networks:
+      - kingsleys_network
+      - internal_network
+      - traefik
+
+
+networks:
+  kingsleys_network:
+    driver: bridge
+
+  internal_network:
+    external: true
+
+  traefik:
+    external: true
