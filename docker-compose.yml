@@ -18,7 +18,7 @@ services:
       - "traefik.docker.network=traefik"
 
       # Frontend ONLY (exclude API)
-      - "traefik.http.routers.kingsleys_frontend.rule=Host(`dashboard.techscapeoslution.com`) && !PathPrefix(`/api`)"
+      - "traefik.http.routers.kingsleys_frontend.rule=Host(`dashboard.techscapesolution.com`) && !PathPrefix(`/api`)"
       - "traefik.http.routers.kingsleys_frontend.priority=1"
       - "traefik.http.routers.kingsleys_frontend.entrypoints=websecure"
       - "traefik.http.routers.kingsleys_frontend.tls=true"
@@ -50,7 +50,7 @@ services:
       - "traefik.docker.network=traefik"
 
       # API routing
-      - "traefik.http.routers.kingsleys_backend.rule=Host(`dashboard.techscapeoslution.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.kingsleys_backend.rule=Host(`dashboard.techscapesolution.com`) && PathPrefix(`/api`)"
       - "traefik.http.routers.kingsleys_backend.priority=100"
       - "traefik.http.routers.kingsleys_backend.entrypoints=websecure"
       - "traefik.http.routers.kingsleys_backend.tls=true"
