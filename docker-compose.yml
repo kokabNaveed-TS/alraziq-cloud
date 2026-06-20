@@ -29,7 +29,7 @@ services:
 
     networks:
       - kingsleys_network
-      - snipeit-net
+      - mysql_default
       - traefik
 
 
@@ -61,7 +61,7 @@ services:
 
     networks:
       - kingsleys_network
-      - snipeit-net
+      - mysql_default
       - traefik
 
 
@@ -69,7 +69,7 @@ networks:
   kingsleys_network:
     driver: bridge
 
-  snipeit-net:
+  mysql_default:
     external: true
 
   traefik:
