@@ -29,7 +29,7 @@ services:
 
     networks:
       - kingsleys_network
-      - internal_network
+      - snipeit-net
       - traefik
 
 
@@ -61,7 +61,7 @@ services:
 
     networks:
       - kingsleys_network
-      - internal_network
+      - snipeit-net
       - traefik
 
 
@@ -69,7 +69,7 @@ networks:
   kingsleys_network:
     driver: bridge
 
-  internal_network:
+  snipeit-net:
     external: true
 
   traefik:
