@@ -18,14 +18,14 @@ services:
       - "traefik.docker.network=traefik"
 
       # Frontend ONLY (exclude API)
-      - "traefik.http.routers.kingsleys_frontend.rule=Host(`dashboard.techscapesolution.com`) && !PathPrefix(`/api`)"
-      - "traefik.http.routers.kingsleys_frontend.priority=1"
-      - "traefik.http.routers.kingsleys_frontend.entrypoints=websecure"
-      - "traefik.http.routers.kingsleys_frontend.tls=true"
-      - "traefik.http.routers.kingsleys_frontend.tls.certresolver=production"
+      - "traefik.http.routers.alraziq_frontend.rule=Host(`dashboard.techscapesolution.com`) && !PathPrefix(`/api`)"
+      - "traefik.http.routers.alraziq_frontend.priority=1"
+      - "traefik.http.routers.alraziq_frontend.entrypoints=websecure"
+      - "traefik.http.routers.alraziq_frontend.tls=true"
+      - "traefik.http.routers.alraziq_frontend.tls.certresolver=production"
 
       # Nginx inside frontend container
-      - "traefik.http.services.kingsleys_frontend.loadbalancer.server.port=80"
+      - "traefik.http.services.alraziq_frontend.loadbalancer.server.port=80"
 
     networks:
       - kingsleys_network
@@ -50,14 +50,14 @@ services:
       - "traefik.docker.network=traefik"
 
       # API routing
-      - "traefik.http.routers.kingsleys_backend.rule=Host(`dashboard.techscapesolution.com`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.kingsleys_backend.priority=100"
-      - "traefik.http.routers.kingsleys_backend.entrypoints=websecure"
-      - "traefik.http.routers.kingsleys_backend.tls=true"
-      - "traefik.http.routers.kingsleys_backend.tls.certresolver=production"
+      - "traefik.http.routers.alraziq_backend.rule=Host(`dashboard.techscapesolution.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alraziq_backend.priority=100"
+      - "traefik.http.routers.alraziq_backend.entrypoints=websecure"
+      - "traefik.http.routers.alraziq_backend.tls=true"
+      - "traefik.http.routers.alraziq_backend.tls.certresolver=production"
 
       # Express port
-      - "traefik.http.services.kingsleys_backend.loadbalancer.server.port=5000"
+      - "traefik.http.services.alraziq_backend.loadbalancer.server.port=5000"
 
     networks:
       - kingsleys_network
