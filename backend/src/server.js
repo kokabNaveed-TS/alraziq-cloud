@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import app from './app.js';
 import { testConnection } from './config/db.js';
+import { startCronJobs } from './utils/cronJobs.js';
 
 dotenv.config();
 
@@ -12,6 +13,9 @@ async function start() {
   try {
     await testConnection();
     console.log('✅ MySQL connection established.');
+    // Start background tasks
+    startCronJobs();
+    console.log('⏰ Background cron jobs started.');
   } catch (err) {
     console.error('❌ Failed to connect to MySQL:', err.message);
     process.exit(1);
