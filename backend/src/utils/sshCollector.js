@@ -65,6 +65,7 @@ echo "=PROCS="; ps aux --sort=-%cpu 2>/dev/null | head -11 | tail -10 | awk '{pr
 echo "=HOSTNAME="; hostname
 echo "=OS="; cat /etc/os-release 2>/dev/null | grep PRETTY_NAME | cut -d= -f2 | tr -d '"' || uname -s
 echo "=KERNEL="; uname -r
+echo "=DOCKER="; docker ps -a --format '{{.ID}}|{{.Names}}|{{.Image}}|{{.State}}|{{.Status}}' 2>/dev/null || echo "not_installed"
 `.trim();
 
   const output = await sshExec(agent, script);
@@ -117,6 +118,19 @@ echo "=KERNEL="; uname -r
   const os = get('OS', 'Linux');
   const kernel = get('KERNEL', 'unknown');
 
+  // Docker Containers
+  const dockerLines = sections['DOCKER'] || [];
+  const docker_containers = [];
+  if (dockerLines.length > 0 && !dockerLines[0].includes('not_installed')) {
+    dockerLines.filter(Boolean).forEach(line => {
+      const parts = line.split('|');
+      if (parts.length >= 5) {
+        const [id, name, image, state, status] = parts;
+        docker_containers.push({ id, name, image, state, status });
+      }
+    });
+  }
+
   return {
     cpu_percent,
     mem_total_mb,
@@ -130,6 +144,7 @@ echo "=KERNEL="; uname -r
     load_15,
     uptime_secs,
     processes,
+    docker_containers,
     sysinfo: { hostname, os, kernel },
   };
 }
@@ -138,8 +153,14 @@ echo "=KERNEL="; uname -r
  * Tails the last N lines of a remote log file and returns them as an array.
  */
 export async function collectLogs(agent, logFile = '/var/log/syslog', lines = 50) {
-  // fallback: if syslog doesn't exist try journalctl or /var/log/messages
-  const cmd = `tail -n ${lines} ${logFile} 2>/dev/null || journalctl -n ${lines} --no-pager 2>/dev/null || tail -n ${lines} /var/log/messages 2>/dev/null || echo "No log file found"`;
+  let cmd;
+  if (logFile.startsWith('docker:')) {
+    const container = logFile.replace('docker:', '');
+    cmd = `docker logs --tail ${lines} ${container} 2>&1 || echo "No logs found for container ${container}"`;
+  } else {
+    // fallback: if syslog doesn't exist try journalctl or /var/log/messages
+    cmd = `tail -n ${lines} ${logFile} 2>/dev/null || journalctl -n ${lines} --no-pager 2>/dev/null || tail -n ${lines} /var/log/messages 2>/dev/null || echo "No log file found"`;
+  }
   const raw = await sshExec(agent, cmd);
   return raw.split('\n').filter(Boolean).map((line) => {
     // Classify level by keywords
